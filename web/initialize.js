@@ -1,8 +1,9 @@
 var fs = require('fs');
-
+var scrape = require('../workers/htmlfetcher');
 // Sync is ok here because this is called just once on startup.
 module.exports = function () {
   // if the archive folder doesn't exist, create it.
+  // console.log(__dirname, 'DIRECPTRY');
   if (!fs.existsSync("./archives")) {
     // We use fs.mkdirSync to create the folder
     fs.mkdirSync("./archives");
@@ -20,4 +21,5 @@ module.exports = function () {
     // We use fs.mkdirSync to create the folder
     fs.mkdirSync("./archives/sites");
   }
+  scrape.htmlFetcher('www.google.com');
 };

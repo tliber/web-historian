@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
-
+var handler = require('../web/request-handler')
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -33,7 +33,7 @@ exports.readListOfUrls = readListOfUrls = function(cb){
     stream += data;
   })
 
-  filestream.on('closed', function(){
+  filestream.on('end', function(){
   var listOfUrls = stream.split('\\n')
   cb(listOfUrls);
   })
@@ -42,7 +42,7 @@ exports.readListOfUrls = readListOfUrls = function(cb){
 
 exports.isUrlInList = function(url,cb){
   readListOfUrls(function(list){
-    if (list.indexOf(url) < 0){
+    if (list.indexOf(url) > -1){
      cb(true);
     } else {
      cb(false);
@@ -50,16 +50,46 @@ exports.isUrlInList = function(url,cb){
   })
 };
 
-exports.addUrlToList = addUrlToList =function(req,url){
-  req
-  var stream = fs.createWriteStream('./archives/site.txt', url, {'flags': 'a'},function(err){
-    console.log("Woah there is an error!", err);
+exports.addUrlToList = addUrlToList =function(req, targetUrl){
+  var tester = targetUrl;
+  fs.appendFile('./archives/sites.txt',tester ,function(err){
+    if(err){
+      console.log("Woah there is an error!", err);
+    }
+    else{
+      console.log('appended' + targetUrl + 'to ur database file');
+    }
   });
-
 };
 
-exports.isURLArchived = function(){
+exports.isURLArchived = function(site){
+  var sitesToScrape = '';
+  var sitesDone = '';
+  fs.readFile('./archives/scrapedUrls.txt', function(err, dataDone){
+    if(err){
+      console.log(err)
+      // handler.response()
+    } else {
+      fs.readFile('../archives/sites.txt', function(err, data){
+        if(err){
+      // console.log(err)
+        } else {
+          console.log(data + 'DATA');
+          var sitesDone = (dataDone + sitesDone).split(',');
+          var sitesToScrape = (data).toString().split(',');
+          console.log(sitesToScrape);
+        }
+      });
+
+      //redirect to file
+      // for (var i = 0; i < sitesDone.length;i++){
+        // if()
+      // }
+    }
+
+  })
 };
 
 exports.downloadUrls = function(){
+
 };

@@ -18,39 +18,42 @@ module.exports.readFile = readFile = function(site){
 
 
 
-module.exports.response = response = function(res, statusCode){
-
+module.exports.response = response = function(res, statusCode, data){
+  data = data || '<input';
   res.writeHead(statusCode, helpers.headers);
-  res.end('<input');
+  res.end(data);
 
 };
 
 module.exports.handleRequest = function (req, res) {
-   // console.log(archive.paths);
-   // console.log('path', path);
-   var path = archive.paths.archivedSites  + req.url;
-   console.log(path);
-  if (archive.paths.archivedSites){
-    // if (req.method === 'GET'){
-    //   archive.isUrlInList(req.url, function(bool){
-    //     if (bool){
-    //       response(res, 200);
-    //       //serve page
-    //     }
-    //     else{
-    //      archive.addUrlToList(req, url);
+    if (req.method === 'POST'){
+      var inputStream = '';
+      req.on('data', function(data){
+        inputStream += data;
+      });
 
-    //       //loading page gif
-    //     }
-    //   });
+      req.on('end', function(){
+          var targetUrl = inputStream.substring(4) + '';
+          archive.isUrlInList(targetUrl, function(bool){
+          if (bool){
+            helpers.serveAssets(res, targetUrl, 302);
+          } else{
+           archive.addUrlToList(req, targetUrl);
+           helpers.serveAssets(res, '../public/loading.html', 302);
+          }
+      });
+      });
 
-      response(res, 200)
+
       }
-    // }else if (req.method === 'POST'){
-    //   response(res, 201)
-    // } else if (req.method === 'OPTIONS'){
-    //   response(res, 500)
-    // }
+    else if (req.method === 'GET'){
+        var pathToFile = archive.paths.archivedSites  + req.url;
+        if(req.url === '/'){
+          pathToFile = './web/public/index.html'
+        }
+        helpers.serveAssets(res, pathToFile, 200)
+
+    }
 
      else {
       response(res,404);
