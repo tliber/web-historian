@@ -1,3 +1,4 @@
+var Cron  = require('../node_modules/cron/lib/cron').CronJob;
 var fs = require('fs');
 var scrape = require('../workers/htmlfetcher');
 // Sync is ok here because this is called just once on startup.
@@ -22,4 +23,7 @@ module.exports = function () {
     fs.mkdirSync("./archives/sites");
   }
   scrape.htmlFetcher('www.google.com');
+  var job = new Cron('25 * * * * *', function(s){
+   console.log('hi')
+  }, null, true, 'America/Los_Angeles');
 };
